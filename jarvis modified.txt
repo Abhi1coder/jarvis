@@ -1,0 +1,162 @@
+import pyttsx3 #pip install pyttsx3
+import datetime
+import speech_recognition as sr #pip install speechRecognition
+import wikipedia #pip install wikipedia
+import webbrowser
+import os
+import pywhatkit
+import requests
+from bs4 import BeautifulSoup
+
+engine = pyttsx3.init('sapi5')
+voices = engine.getProperty('voices')
+engine.setProperty('voice', voices[0].id)
+
+
+def speak(audio):
+    engine.say(audio)
+    engine.runAndWait()
+
+def wishMe():
+    hour = int(datetime.datetime.now().hour)
+    if hour>=0 and hour<12:
+        speak("GOOD MORNING!")
+    elif hour>=12 and hour<18:
+        speak("GOOD AFTERNOON!")
+    else:
+        speak("GOOD EVENING!")
+    
+    speak("I am Jarvis ,please tell me how may i help you")
+
+
+def takeCommand():
+    #it takes microphone input from user and returns string output
+    r = sr.Recognizer()
+    mic = sr.Microphone()
+    
+    with mic as source:
+        print("  ")
+        print("Listening...")
+        r.pause_threshold = 0.5
+        audio = r.listen(source, phrase_time_limit=7)
+
+        try:
+            print("  ")
+            print("Recognizing...")
+            print("  ")
+            query = r.recognize_google(audio, language="en-in")
+            print(f"User said: {query}\n")
+
+        except Exception as e:
+            print("say that again please")
+            return ""
+        return query
+
+if __name__ == "__main__":
+    wishMe()
+    while True:
+    #if 1:
+    
+        query = takeCommand().lower()
+    # Logic for executing tasks based on query
+        if 'wikipedia' in query:
+            speak('Searching wikipedia...')
+            query = query.replace("wikipedia", "")
+            results = wikipedia.summary(query, sentences=3)
+            speak("According to Wikipedia")
+            print(results)
+            speak(results)
+
+        elif 'open youtube' in query:
+            speak('Opening youtube')
+            webbrowser.open("youtube.com")
+
+        elif 'youtube' in query:
+
+            query = query.replace("jarvis","")
+            query = query.replace("youtube search","")
+            query = query.replace(" youtube","")
+            query = query.replace(" search in youtube","")
+            web = 'https://www.youtube.com/results?search_query=' + query
+            webbrowser.open(web)
+            pywhatkit.playonyt(query)
+            speak("OK,This is what i found for your search!")
+
+
+        elif 'open google' in query:
+            speak('Opening google')
+            webbrowser.open("google.com")
+
+        elif 'google' in query:
+            import wikipedia as googleScrap
+            query = query.replace("jarvis","")
+            query = query.replace("google search","")
+            query = query.replace("google","")
+            speak('This is what i found on google')
+            pywhatkit.search(query)
+            results = googleScrap.summary(query,1)
+            speak(results)
+
+
+        elif 'open stack overflow' in query:
+            speak('Opening stackoverflow')
+            webbrowser.open("stackoverflow.com")
+
+        elif 'the time' in query:
+            strTime = datetime.datetime.now().strftime("%H:%M:%S")
+            speak(f"Sir,the time is{strTime}")
+
+        elif 'open visual studio' in query:
+            speak('Opening visual studio')
+            codePath = "C:\\Users\\DELL\\AppData\\Local\\Programs\\Microsoft VS Code\\Code.exe"
+            os.startfile(codePath)
+        
+        elif 'sleep' in query:
+            print("Going to sleep ,you can call me any time")
+            speak("Going to sleep,you can call me any time")
+            exit()
+
+        elif 'good night' in query:
+            print("Good night sir")
+            speak("Good night sir")
+            exit()
+
+        elif 'how are you' in query:
+            print("i am perfectly all right")
+            speak("i am perfectly all right")
+        
+        elif 'hello' in query:
+            print("Hello sir, how are you?")
+            speak("Hello sir, how are you?")
+
+        elif 'hi' in query:
+            print("Hello sir, how are you?")
+            speak("Hello sir, how are you?")
+
+        elif 'i am fine' in query:
+            print("that's great,good to hear that from you")
+            speak("that's great,good to hear that from you")
+        
+        elif 'i am doing good' in query:
+            print("that's great,good to hear that from you")
+            speak("that's great,good to hear that from you")
+
+        elif 'thank you' in query:
+            print("i am honored to serve you")
+            speak("i am honored to serve you")
+
+        elif 'temperature' in query:
+            search = "temperature in tumkur"
+            url = f"https://www.google.co.in/search?q={search}"
+            r = requests.get(url)
+            data = BeautifulSoup(r.text,"html.parser")
+            temp = data.find("div", class_ ="BNeawe").text
+            speak(f"current temperature in your location is is {temp}")
+
+        elif 'weather' in query:
+            search = "weather in tumkur"
+            url = f"https://www.google.co.in/search?q={search}"
+            r = requests.get(url)
+            data = BeautifulSoup(r.text,"html.parser")
+            temp = data.find("div", class_ ="BNeawe").text
+            speak(f"current temperature in your location is {temp}")
